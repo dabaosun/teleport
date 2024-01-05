@@ -16,23 +16,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { SetStateAction } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { color, height, space } from 'design/system';
 
-export default function InputSearch({
+import { SearchInputProps } from './types';
+
+/**
+ * Search input component
+ *
+ * @remarks
+ * This component is a generic version of the component found in web/packages/teleport/src/UnifiedResources
+ *
+ * @param dataType - the data type of the table associated with the search; will populate the placeholder text
+ * @param searchValue - searchValue should be stored and leveraged in the parent component
+ * @param setSearchValue - setSearchValue should be initialized in the parent component
+ * @param children - optional children, will be rendered at the end of the input. Use cases include: AdvancedSearchToggle
+ * @param ariaLabel - optional (to avoid breaking changes), will set an accessible label on the input
+ *
+ */
+export function SearchInput({
+  dataType,
   searchValue,
   setSearchValue,
   children,
   ariaLabel,
-}: Props) {
+}: SearchInputProps) {
+  const formattedType =
+    dataType.charAt(0).toUpperCase() + dataType.slice(1).toLowerCase();
+
   return (
     <WrapperBackground>
       <Wrapper>
         <StyledInput
           aria-label={ariaLabel}
-          placeholder="SEARCH..."
+          placeholder={`Search for ${formattedType}...`}
           px={3}
           value={searchValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -47,13 +66,6 @@ export default function InputSearch({
   );
 }
 
-type Props = {
-  searchValue: string;
-  setSearchValue: React.Dispatch<SetStateAction<string>>;
-  children?: JSX.Element;
-  ariaLabel?: string;
-};
-
 const ChildWrapper = styled.div`
   position: relative;
   height: 100%;
@@ -61,8 +73,7 @@ const ChildWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${props => props.theme.colors.spotBackground[0]};
-  border-radius: 200px;
+  border-radius: 0 200px 200px 0;
 `;
 
 const ChildWrapperBackground = styled.div`
@@ -72,11 +83,9 @@ const ChildWrapperBackground = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${props =>
-    props.theme.type === 'dark'
-      ? props.theme.colors.levels.surface
-      : props.theme.colors.levels.deep};
-  border-radius: 200px;
+  border-left: ${props => props.theme.borders[1]}
+    ${props => props.theme.colors.spotBackground[0]};
+  border-radius: 0 200px 200px 0;
 `;
 
 const Wrapper = styled.div`
@@ -85,7 +94,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   width: 100%;
   border-radius: 200px;
-  height: 32px;
+  height: 100%;
   background: transparent;
 `;
 
@@ -93,42 +102,21 @@ const WrapperBackground = styled.div`
   background: ${props => props.theme.colors.levels.sunken};
   border-radius: 200px;
   width: 100%;
-  height: 32px;
+  height: ${props => props.theme.space[8]}px;
 `;
 
 const StyledInput = styled.input`
   border: none;
   outline: none;
   box-sizing: border-box;
-  height: 100%;
-  font-size: 12px;
+  font-size: ${props => props.theme.fontSizes[3]}px;
   width: 100%;
   transition: all 0.2s;
   ${color}
   ${space}
   ${height}
-  ${fromTheme};
+  color: ${props => props.theme.colors.text.main};
+  background: ${props => props.theme.colors.spotBackground[0]};
   padding-right: 184px;
+  padding-left: ${props => props.theme.space[5]}px;
 `;
-
-function fromTheme(props) {
-  return {
-    color: props.theme.colors.text.main,
-    background:
-      props.theme.type === 'dark'
-        ? props.theme.colors.levels.sunken
-        : props.theme.colors.levels.deep,
-
-    '&:hover, &:focus, &:active': {
-      color: props.theme.colors.text.main,
-      background:
-        props.theme.type === 'dark'
-          ? props.theme.colors.spotBackground[0]
-          : props.theme.colors.levels.sunken,
-    },
-    '&::placeholder': {
-      color: props.theme.colors.text.muted,
-      fontSize: props.theme.fontSizes[1],
-    },
-  };
-}

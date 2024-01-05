@@ -16,14 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Text, Flex } from 'design';
+import { Flex, Text } from 'design';
 import { StyledPanel } from 'design/DataTable';
 import InputSearch from 'design/DataTable/InputSearch';
-import { ResourceFilter } from 'teleport/services/agents';
 
-import { AdvancedSearchToggle } from 'shared/components/AdvancedSearchToggle';
+import { SearchFilter } from 'shared/components/Search/Search-v2/types';
+import { AdvancedSearchToggle } from 'shared/components/Search/Search-v2/AdvancedSearchToggle';
+
+export type SearchPanelProps = {
+  updateQuery(s: string): void;
+  updateSearch(s: string): void;
+  pageIndicators: { from: number; to: number; total: number };
+  filter: SearchFilter;
+  showSearchBar: boolean;
+  disableSearch: boolean;
+  extraChildren?: JSX.Element;
+};
 
 export function SearchPanel({
   updateQuery,
@@ -33,15 +43,7 @@ export function SearchPanel({
   showSearchBar,
   disableSearch,
   extraChildren,
-}: {
-  updateQuery(s: string): void;
-  updateSearch(s: string): void;
-  pageIndicators: { from: number; to: number; total: number };
-  filter: ResourceFilter;
-  showSearchBar: boolean;
-  disableSearch: boolean;
-  extraChildren?: JSX.Element;
-}) {
+}: SearchPanelProps) {
   const [query, setQuery] = useState(filter.search || filter.query || '');
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(!!filter.query);
 
@@ -107,6 +109,7 @@ const StyledFlex = styled(Flex)`
   // The timing functions of transitions have been chosen so that the element loses opacity slowly
   // when entering the disabled state but gains it quickly when going out of the disabled state.
   transition: opacity 150ms ease-out;
+
   &.disabled {
     pointer-events: none;
     opacity: 0.7;

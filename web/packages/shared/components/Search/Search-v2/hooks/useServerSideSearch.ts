@@ -20,14 +20,15 @@ import { useEffect, useState } from 'react';
 
 import { encodeUrlQueryParams } from 'shared/utils/EncodeUrlQueryParams/encodeUrlQueryParams';
 
-import { ResourceFilter } from 'teleport/services/agents';
+import { SearchState, UseServersideSearchProps } from '../types';
 
-export default function useServersideSearchPanel({
+export default function useServersideSearch({
+  dataType,
   pathname,
   params,
   setParams,
   replaceHistory,
-}: HookProps) {
+}: UseServersideSearchProps): SearchState {
   const [searchString, setSearchString] = useState('');
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -82,6 +83,7 @@ export default function useServersideSearchPanel({
   }, [params.sort]);
 
   return {
+    dataType,
     searchString,
     setSearchString,
     isAdvancedSearch,
@@ -92,18 +94,5 @@ export default function useServersideSearchPanel({
 
 function decodeUrlQueryParam(param: string) {
   // Prevents URI malformed error by replacing lone % with %25
-  const decodedQuery = decodeURIComponent(
-    param.replace(/%(?![0-9][0-9a-fA-F]+)/g, '%25')
-  );
-
-  return decodedQuery;
+  return decodeURIComponent(param.replace(/%(?![0-9][0-9a-fA-F]+)/g, '%25'));
 }
-
-export type HookProps = {
-  pathname: string;
-  replaceHistory: (path: string) => void;
-  params: ResourceFilter;
-  setParams: (params: ResourceFilter) => void;
-};
-
-export type SearchPanelState = ReturnType<typeof useServersideSearchPanel>;

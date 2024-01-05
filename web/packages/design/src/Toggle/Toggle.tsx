@@ -25,16 +25,19 @@ export function Toggle({
   children,
   disabled,
   className,
+  labeledBy,
 }: {
   isToggled: boolean;
   onToggle: () => void;
   children?: ReactNode;
   disabled?: boolean;
   className?: string;
+  labeledBy?: string;
 }) {
   return (
     <StyledWrapper disabled={disabled} className={className}>
       <StyledInput
+        aria-labelledby={labeledBy}
         checked={isToggled}
         onChange={onToggle}
         disabled={disabled}

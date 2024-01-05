@@ -16,4 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export { useUrlFiltering } from './useUrlFiltering';
+import ServersideSearch from './ServersideSearch';
+
+export * from './AdvancedSearchInput';
+export * from './SearchInput';
+export * from './AdvancedSearchToggle';
+export * from './hooks';
+export { ServersideSearch };

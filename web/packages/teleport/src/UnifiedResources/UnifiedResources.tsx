@@ -27,6 +27,7 @@ import {
   UnifiedResourcesPinning,
 } from 'shared/components/UnifiedResources';
 import { DefaultTab } from 'shared/services/unifiedResourcePreferences';
+import { encodeUrlQueryParams } from 'shared/utils/EncodeUrlQueryParams/encodeUrlQueryParams';
 
 import useStickyClusterId from 'teleport/useStickyClusterId';
 import { storageService } from 'teleport/services/storageService';
@@ -42,7 +43,6 @@ import {
 } from 'teleport/components/Layout';
 import AgentButtonAdd from 'teleport/components/AgentButtonAdd';
 import { SearchResource } from 'teleport/Discover/SelectResource';
-import { encodeUrlQueryParams } from 'teleport/components/hooks/useUrlFiltering';
 import Empty, { EmptyStateInfo } from 'teleport/components/Empty';
 import { FeatureFlags } from 'teleport/types';
 
