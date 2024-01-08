@@ -16,10 +16,18 @@ limitations under the License.
 package utils
 
 import (
+	"io"
+
 	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 )
 
-func CreateSyslogHook() (logrus.Hook, error) {
+// NewSyslogHook always returns an error on Windows.
+func NewSyslogHook(io.Writer) (logrus.Hook, error) {
+	return nil, trace.NotImplemented("cannot use syslog on Windows")
+}
+
+// NewSyslogWriter always returns an error on Windows.
+func NewSyslogWriter() (io.Writer, error) {
 	return nil, trace.NotImplemented("cannot use syslog on Windows")
 }
