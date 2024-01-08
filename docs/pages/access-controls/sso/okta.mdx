@@ -3,6 +3,128 @@ title: Authentication With Okta as an SSO Provider
 description: How to configure Teleport access using Okta for SSO
 videoBanner: SM4Am-i8cj4
 ---
+# Getting Started
+
+This guide covers how to configure [Okta](https://www.okta.com/) to provide
+identities to Teleport, and allow Teleport to synchronize from Okta.
+
+There are two main ways to get started integrating Teleport with Okta:
+
+ 1. If you are using Teleport Enterprise Cloud, you can [enrol the Okta
+    Integration](#enrolling-the-okta-integration) in your cluster, which will
+    automatically configure SSO access with user, group, and application 
+    synchronization enabled, or
+ 2. If you are not using Teleport Enterprise Cloud, or you would prefer to use
+    the Okta SSO provider without the extra features provided by enrolling the
+    Okta integration into your cluster, you can configure
+    [SSO via SAML manually](#manually-configuring-an-okta-sso-provider).
+
+# Enrolling the Okta Integration
+
+## What does the Integration do?
+
+During enrolment, the Integration
+ 1. automatically creates a `Teleport $YOUR-CLUSTERNAME` application in Okta 
+    for SAML sign-on,
+ 1. creates an SSO connector named `okta-integration` that binds Teleport to the
+    Okta application,
+ 1. assigns the built-in `Everyone` Okta group to the new application, granting
+    all Okta users in the organisation access to Teleport. 
+
+<Admonition type="tip">
+Note that Okta-origin users are only granted the `requester` role, meaning that
+by default they have no access to Teleport Cluster resources. They may request
+access to resources as necessary, or you can manage longer-lived permissions
+using Access Lists.
+</Admonition>
+
+Once the integration is up and running, Teleport will sync all okta-origin users
+against the upstream Okta organisation every half hour or so. During this sync, 
+teleport will:
+ - create new Teleport accounts for new Okta users, 
+ - update the traits on Okta-origin Teleport users,
+ - suspend Okta-origin Teleport users if their upstream Okta account is
+   suspended (including terminating any active sessions), and
+ - delete any Okta-origin Teleport users that have been deactivated and/or
+   deleted in the upstream Okta organisation, including terminating any active
+   Teleport sessions.
+
+All non-empty fields in an Okta user's profile are converted to Teleport user
+traits, prefixed with `okta/`. For example the `firstName` field becomes the
+`okta/firstName` trait. These traits can be used to manage access to Teleport 
+resources via AccessLists. 
+
+<Admonition type="tip">
+The user sync process is strictly one-way. Teleport will not attempt to update
+users in Okta.
+</Admonition>
+
+## Prerequisites
+
+- An Okta organization and an Okta account with admin access
+- A Teleport cluster with version >= 14
+- A Teleport account with admin access
+
+## Step 1/4. Create an Okta admin Role for the Teleport Integration
+
+Create an admin role for the Teleport Okta Service by following the Okta 
+[Create Role guide](https://help.okta.com/en-us/content/topics/security/custom-admin-role/create-role.htm).
+
+The role must have the following Okta permissions:
+  - User permissions:
+    - View users and their details
+    - Edit users' group membership
+    - Edit users' application assignments
+  - Group permissions
+    - View groups and their details
+    - Manage group membership
+  - Application permissions
+    - Add and configure application (for initial setup)
+    - View applications and their details
+    - Edit application's user assignments
+
+For more information Okta admin permissions, consult the Okta [Standard
+administrator roles and permissions](https://help.okta.com/en-us/content/topics/security/administrators-admin-comparison.htm) guide.
+
+## Step 2/4. Create an Okta user for Teleport
+
+Follow the Okta [Admin Role Assignment](https://help.okta.com/en-us/content/topics/security/custom-admin-role/create-admin-role-assignment-by-admin.htm)
+guide to create to create a user for the Teleport Okta Integration to use, and 
+assign two roles to that user:
+  1. The built-in Group Membership Admin role, which can create API tokens, and
+  2. The role you created earlier
+
+## Step 3/4. Generate an Okta API key
+
+Sign in to Okta as the user you created in Step 2 and follow the Okta
+[Create Okta API Tokens](https://help.okta.com/en-us/content/topics/security/api.htm#create-okta-api-token)
+guide to generate an API token. This token inherits the permissions of the
+signed-in user user. 
+
+## Step 4/4. Enrol the Okta Integration
+
+Sign into Teleport and navigate to the "Enrol integration" page. Once there, 
+select the Okta icon to install the Teleport Integration. 
+
+Configure the integration with your Okta organisation URL, paste in the API
+token create in Step 3, and press the `Enrol` button. The integration may take a
+second to install.
+
+## Deleting the integration
+
+If you delete the Okta integration, the SSO provider and users created during
+enrolment are not automatically destroyed. The SSO provider can be deleted via 
+the UI, but any obsolete Okta-origin users must be deleted with `tctl`.
+
+## Troubleshooting
+
+### No Okta app was created
+
+If an SSO connector named `okta-integration` exists at the time of enrolment, 
+the integration installer assumes that the Okta resources are already configured
+and skips the setup. Try deleting the SSO connector and try again.
+
+# Manually configuring an Okta SSO Provider
 
 This guide covers how to configure [Okta](https://www.okta.com/) to provide
 single sign on (SSO) identities to Teleport Enterprise and Teleport Enterprise
