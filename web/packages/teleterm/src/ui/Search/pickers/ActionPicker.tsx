@@ -27,7 +27,7 @@ import {
   hasFinished,
   makeSuccessAttempt,
 } from 'shared/hooks/useAsync';
-import { AdvancedSearchToggle } from 'shared/components/AdvancedSearchToggle';
+import { AdvancedSearchToggle } from 'shared/components/Search/Search-v2/AdvancedSearchToggle';
 
 import { useAppContext } from 'teleterm/ui/appContextProvider';
 import {

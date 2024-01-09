@@ -22,7 +22,7 @@ import { Box, Flex } from 'design';
 import { StyledPanel } from 'design/DataTable';
 import InputSearch from 'design/DataTable/InputSearch';
 
-import { AdvancedSearchToggle } from 'shared/components/AdvancedSearchToggle';
+import { AdvancedSearchToggle } from 'shared/components/Search/Search-v2/AdvancedSearchToggle';
 
 import { PageIndicators } from 'teleport/components/hooks/useServersidePagination';
 

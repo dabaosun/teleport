@@ -19,7 +19,7 @@
 import React from 'react';
 import { Flex } from 'design';
 
-import { AdvancedSearchToggle } from 'shared/components/AdvancedSearchToggle';
+import { AdvancedSearchToggle } from 'shared/components/Search/Search-v2/AdvancedSearchToggle';
 
 import useServersideSearchPanel, {
   SearchPanelState,
