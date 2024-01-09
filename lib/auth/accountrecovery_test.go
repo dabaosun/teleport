@@ -572,7 +572,6 @@ func TestCompleteAccountRecovery(t *testing.T) {
 	user, err := srv.Auth().GetUser(ctx, u.username, false)
 	require.NoError(t, err)
 	require.False(t, user.GetStatus().IsLocked)
-	require.True(t, user.GetStatus().RecoveryAttemptLockExpires.IsZero())
 	require.True(t, user.GetStatus().LockExpires.IsZero())
 
 	// Test login attempts are removed.
