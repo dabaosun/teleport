@@ -578,6 +578,14 @@
 	  "title": "Using Dynamic Resources",
 	  "slug": "/management/dynamic-resources/",
 	  "entries": [
+        {
+          "title": "Managing users and roles",
+          "slug": "/management/dynamic-resources/user-and-role/"
+        },
+        {
+          "title": "Managing Access Lists",
+          "slug": "/management/dynamic-resources/access-list/"
+        },
 	    {
           "title": "Kubernetes Operator",
           "slug": "/management/dynamic-resources/teleport-operator/"
@@ -1643,6 +1651,10 @@
         {
           "title": "Signals",
           "slug": "/reference/signals/"
+        },
+        {
+          "title": "User types",
+          "slug": "/reference/user-types/"
         },
         {
           "title": "Helm Charts",
