@@ -3081,13 +3081,8 @@ message LoginStatus {
     (gogoproto.nullable) = false,
     (gogoproto.jsontag) = "lock_expires,omitempty"
   ];
-  // DEPRECATED RecoveryAttemptLockExpires contains the time when this lock will expire
-  // from reaching MaxAccountRecoveryAttempts.
-  google.protobuf.Timestamp DEPRECATEDRecoveryAttemptLockExpires = 5 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false,
-    (gogoproto.jsontag) = "recovery_attempt_lock_expires,omitempty"
-  ];
+  reserved 5;  // removed RecoveryAttemptLockExpires after lockout was removed
+  reserved "RecoveryAttemptLockExpires";
 }
 
 // CreatedBy holds information about the person or agent who created the user
