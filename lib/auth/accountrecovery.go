@@ -88,9 +88,8 @@ func (a *Server) StartAccountRecovery(ctx context.Context, req *proto.StartAccou
 	return token, nil
 }
 
-// verifyCodeWithRecoveryLock counts number of failed attempts at providing a valid recovery code.
-// After MaxAccountRecoveryAttempts, user is temporarily locked from further attempts at recovering and also
-// locked from logging in. Modeled after existing function WithUserLock.
+// verifyCodeWithRecoveryLock validates the recovery code for the user and will unlock their account if 
+// the code is valid.  If the code is invalid, a failed recovery attempt will be recorded.
 func (a *Server) verifyCodeWithRecoveryLock(ctx context.Context, username string, recoveryCode []byte) error {
 	_, err := a.Services.GetUser(ctx, username, false)
 	switch {
