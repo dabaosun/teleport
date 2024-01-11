@@ -88,7 +88,7 @@ func (a *Server) StartAccountRecovery(ctx context.Context, req *proto.StartAccou
 	return token, nil
 }
 
-// verifyCodeWithRecoveryLock validates the recovery code for the user and will unlock their account if 
+// verifyCodeWithRecoveryLock validates the recovery code for the user and will unlock their account if
 // the code is valid.  If the code is invalid, a failed recovery attempt will be recorded.
 func (a *Server) verifyCodeWithRecoveryLock(ctx context.Context, username string, recoveryCode []byte) error {
 	_, err := a.Services.GetUser(ctx, username, false)
@@ -111,7 +111,7 @@ func (a *Server) verifyCodeWithRecoveryLock(ctx context.Context, username string
 	}
 
 	if err := a.recordFailedRecoveryAttempt(ctx, username); err != nil {
-		log.Error(trace.DebugReport(err))
+		log.WithError(err).Warn("Error recording failed account recovery attempt")
 	}
 	return trace.Wrap(verifyCodeErr)
 }
@@ -252,9 +252,8 @@ func (a *Server) VerifyAccountRecovery(ctx context.Context, req *proto.VerifyAcc
 	return approvedToken, nil
 }
 
-// verifyAuthnWithRecoveryLock counts number of failed attempts at providing a valid password or second factor.
-// After MaxAccountRecoveryAttempts, user's account is temporarily locked from logging in, recovery attempts are reset,
-// and all user's tokens are deleted. Modeled after existing function WithUserLock.
+// verifyAuthnWithRecoveryLock validates the recovery code (through authenticateFn).  If the code is invalid,
+// a failed recovery attempt will be recorded.
 func (a *Server) verifyAuthnWithRecoveryLock(ctx context.Context, startToken types.UserToken, authenticateFn func() error) error {
 	// Determine user exists first since an existence of token
 	// does not guarantee the user defined in token exists anymore.
@@ -277,7 +276,7 @@ func (a *Server) verifyAuthnWithRecoveryLock(ctx context.Context, startToken typ
 
 	log.Error(trace.DebugReport(verifyAuthnErr))
 	if err := a.recordFailedRecoveryAttempt(ctx, startToken.GetUser()); err != nil {
-		log.Error(trace.DebugReport(err))
+		log.WithError(err).Warn("Error recording failed account recovery attempt")
 	}
 
 	return trace.AccessDenied(verifyRecoveryBadAuthnErrMsg)
@@ -288,11 +287,7 @@ func (a *Server) recordFailedRecoveryAttempt(ctx context.Context, username strin
 	// Record and log failed attempt.
 	now := a.clock.Now().UTC()
 	attempt := &types.RecoveryAttempt{Time: now, Expires: now.Add(defaults.AttemptTTL)}
-	if err := a.CreateUserRecoveryAttempt(ctx, username, attempt); err != nil {
-		return trace.Wrap(err)
-	}
-
-	return nil
+	return trace.Wrap(a.CreateUserRecoveryAttempt(ctx, username, attempt))
 }
 
 // CompleteAccountRecovery implements AuthService.CompleteAccountRecovery.
