@@ -3265,7 +3265,7 @@ message LoginStatus {
     (gogoproto.nullable) = false,
     (gogoproto.jsontag) = "lock_expires,omitempty"
   ];
-  reserved 5; // removed RecoveryAttemptLockExpires after lockout was removed
+  reserved 5; // removed "google.protobuf.Timestamp RecoveryAttemptLockExpires" after lockout was removed
   reserved "RecoveryAttemptLockExpires";
 }
 
