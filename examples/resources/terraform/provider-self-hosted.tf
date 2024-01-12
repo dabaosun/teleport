@@ -21,7 +21,7 @@ resource "teleport_role" "test" {
     name        = "test"
     description = "Dummy role to validate Terraform Provider setup"
     labels = {
-      test  = "yes"
+      test = "yes"
     }
   }
 
