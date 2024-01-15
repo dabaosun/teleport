@@ -34,7 +34,13 @@ import (
 	"sigs.k8s.io/controller-tools/pkg/markers"
 )
 
-const k8sKindPrefix = "Teleport"
+const (
+	k8sKindPrefix     = "Teleport"
+	statusPackagePath = "github.com/gravitational/teleport/integrations/operator/apis"
+	statusPackageName = "resources"
+	statusPackage     = statusPackagePath + "/" + statusPackageName
+	statusTypeName    = "Status"
+)
 
 // Add names to this array when adding support to new Teleport resources that could conflict with Kubernetes
 var (
@@ -66,14 +72,12 @@ type RootSchema struct {
 }
 
 type SchemaVersion struct {
-	// teleportVersion is the Teleport resource version
-	teleportVersion string
-	// kubernetesVersion is the Kubernetes CR API version. For single-version
-	// Teleport resource, this is equal to teleportVersion for compatibility
-	// purposes. For multi-version resource, the value is always "v1" as the
-	// version is already in the CR kind.
-	kubernetesVersion string
-	Schema            *Schema
+	// Version is the Kubernetes CR API version. For single-version
+	// Teleport resource, this is equal to the Teleport resource Version for
+	// compatibility purposes. For multi-version resource, the value is always
+	// "v1" as the version is already in the CR kind.
+	Version string
+	Schema  *Schema
 }
 
 // Schema is a set of object properties.
@@ -217,9 +221,8 @@ func (generator *SchemaGenerator) addResource(file *File, name string, opts ...r
 		kubernetesVersion = "v1"
 	}
 	root.versions = append(root.versions, SchemaVersion{
-		teleportVersion:   resourceVersion,
-		kubernetesVersion: kubernetesVersion,
-		Schema:            schema,
+		Version: kubernetesVersion,
+		Schema:  schema,
 	})
 
 	return nil
@@ -448,7 +451,10 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 	registry := &markers.Registry{}
 	// CRD markers contain special markers used by the parser to discover properties
 	// e.g. `+kubebuilder:validation:Minimum=0`
-	crdmarkers.Register(registry)
+	err := crdmarkers.Register(registry)
+	if err != nil {
+		panic(err)
+	}
 	parser := &crdtools.Parser{
 		Collector: &markers.Collector{Registry: registry},
 		Checker:   &loader.TypeChecker{},
@@ -457,30 +463,19 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 	// Some types are special and require manual overrides, like metav1.Time.
 	crdtools.AddKnownTypes(parser)
 
-	pkgs, err := loader.LoadRoots("github.com/gravitational/teleport/integrations/operator/apis/...")
+	// Status does not exist in Teleport, only in the CR.
+	// We parse go's AST to find its struct and convert it in a schema.
+	statusSchema, err := getStatusSchema(parser)
 	if err != nil {
-		fmt.Printf("parser error: %s", err)
+		panic(err)
 	}
 
 	for i, schemaVersion := range root.versions {
 
-		var statusType crdtools.TypeIdent
 		schema := schemaVersion.Schema
-		for _, pkg := range pkgs {
-			// This if is a bit janky, condition checking should be stronger
-			if pkg.Name == schemaVersion.teleportVersion {
-				parser.NeedPackage(pkg)
-				statusType = crdtools.TypeIdent{
-					Package: pkg,
-					Name:    fmt.Sprintf("%s%sStatus", k8sKindPrefix, root.teleportKind),
-				}
-				// Kubernetes CRDs don't support $ref in openapi schemas, we need a flattened schema
-				parser.NeedFlattenedSchemaFor(statusType)
-			}
-		}
 
 		crd.Spec.Versions = append(crd.Spec.Versions, apiextv1.CustomResourceDefinitionVersion{
-			Name:   schemaVersion.kubernetesVersion,
+			Name:   schemaVersion.Version,
 			Served: true,
 			// Storage the first version available.
 			Storage: i == 0,
@@ -502,7 +497,7 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 						},
 						"metadata": {Type: "object"},
 						"spec":     schema.JSONSchemaProps,
-						"status":   parser.FlattenedSchemata[statusType],
+						"status":   statusSchema,
 					},
 				},
 			},
@@ -518,4 +513,26 @@ func (root RootSchema) getShortNames() []string {
 		return []string{}
 	}
 	return []string{root.name, root.pluralName}
+}
+
+func getStatusSchema(parser *crdtools.Parser) (apiextv1.JSONSchemaProps, error) {
+	pkgs, err := loader.LoadRoots(statusPackage)
+	if err != nil {
+		// Loader errors might be non-critical.
+		// e.g. the loader complains about the unknown "toolchain" directive in our go mod
+		fmt.Printf("loader error: %s", err)
+	}
+	var statusType crdtools.TypeIdent
+	for _, pkg := range pkgs {
+		if pkg.Name == "resources" {
+			parser.NeedPackage(pkg)
+			statusType = crdtools.TypeIdent{
+				Package: pkg,
+				Name:    fmt.Sprintf(statusTypeName),
+			}
+			parser.NeedFlattenedSchemaFor(statusType)
+			return parser.FlattenedSchemata[statusType], nil
+		}
+	}
+	return apiextv1.JSONSchemaProps{}, trace.NotFound("Package '%s' not found, cannot generate status JSON Schema", statusPackage)
 }
