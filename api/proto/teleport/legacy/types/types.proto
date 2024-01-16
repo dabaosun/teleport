@@ -6486,3 +6486,44 @@ message OktaOptions {
     (gogoproto.casttype) = "Duration"
   ];
 }
+
+// AccessMonitoringRule represents an acces monitoring rule resources.
+message AccessMonitoringRule {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
+
+  // Kind is a resource kind
+  string Kind = 1 [(gogoproto.jsontag) = "kind"];
+  // SubKind is an optional resource sub kind, used in some resources
+  string SubKind = 2 [(gogoproto.jsontag) = "sub_kind,omitempty"];
+  // Version is version
+  string Version = 3 [(gogoproto.jsontag) = "version"];
+  // Metadata is the access resource's metadata
+  Metadata Metadata = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.jsontag) = "metadata"
+  ];
+  // Spec is an AccessMonitoringRule specification
+  AccessMonitoringRuleSpec Spec = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.jsontag) = "spec"
+  ];
+}
+
+// AccessMonitoringRuleSpec is the access monitoring rule spec
+message AccessMonitoringRuleSpec {
+  // Subjects the rule operates on, can be a resource kind or a particular resource property.
+  repeated string Subjects = 1 [(gogoproto.jsontag) = "subjects,omitempty"];
+  // Desired state which the monitoring rule is attempting to bring the subjects matching the condition to.
+  repeated string States = 2 [(gogoproto.jsontag) = "states,omitempty"];
+  // Condition is a predicate expression that operates on the specified subject resources,
+  // and determines whether the subject will be moved into desired state.
+  string Condition = 3 [(gogoproto.jsontag) = "condition,omitempty"];
+}
+
+message PluginNotificationConfiguration {
+  // Name is the name of the plugin to which this configuration should apply.
+  string Name = 1 [(gogoproto.jsontag) = "name"];
+  // Recipients is the list of recipients the plugin should notify.
+  repeated string Recipients = 2 [(gogoproto.jsontag) = "recipients"];
+}
