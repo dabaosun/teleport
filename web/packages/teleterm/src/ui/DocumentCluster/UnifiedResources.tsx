@@ -31,7 +31,7 @@ import {
   DbType,
 } from 'shared/services/databases';
 
-import { Flex, ButtonPrimary, Text } from 'design';
+import { Flex, ButtonPrimary, Text, Link } from 'design';
 
 import * as icons from 'design/Icon';
 import Image from 'design/Image';
@@ -115,6 +115,7 @@ function Resources(props: {
   updateUserPreferences(u: UserPreferences): Promise<void>;
 }) {
   const appContext = useAppContext();
+  const { clustersService } = appContext;
   const { onResourcesRefreshRequest } = useResourcesContext();
 
   const { documentsService, rootClusterUri } = useWorkspaceContext();
@@ -124,6 +125,11 @@ function Resources(props: {
 
   const isRootCluster = props.clusterUri === rootClusterUri;
   const canAddResources = isRootCluster && loggedInUser?.acl?.tokens.create;
+  let discoverUrl: string;
+  if (isRootCluster) {
+    const rootCluster = clustersService.findCluster(rootClusterUri);
+    discoverUrl = `https://${rootCluster.proxyHost}/web/discover`;
+  }
 
   const canUseConnectMyComputer =
     isRootCluster &&
@@ -252,6 +258,7 @@ function Resources(props: {
       NoResources={
         <NoResources
           canCreate={canAddResources}
+          discoverUrl={discoverUrl}
           canUseConnectMyComputer={canUseConnectMyComputer}
           onConnectMyComputerCtaClick={() => {
             documentsService.openConnectMyComputerDocument({ rootClusterUri });
@@ -341,6 +348,7 @@ const mapToSharedResource = (
 
 function NoResources(props: {
   canCreate: boolean;
+  discoverUrl: string | undefined;
   canUseConnectMyComputer: boolean;
   onConnectMyComputerCtaClick(): void;
 }) {
@@ -358,6 +366,11 @@ function NoResources(props: {
       </>
     );
   } else {
+    const $discoverLink = (
+      <Link href={props.discoverUrl} target="_blank">
+        the&nbsp;Teleport Web UI
+      </Link>
+    );
     $content = (
       <>
         <Image src={stack} ml="auto" mr="auto" mb={4} height="100px" />
@@ -365,9 +378,17 @@ function NoResources(props: {
           Add your first resource to Teleport
         </Text>
         <Text color="text.slightlyMuted">
-          {props.canUseConnectMyComputer
-            ? 'You can add it in the Teleport Web UI or by connecting your computer to the cluster.'
-            : 'Connect SSH servers, Kubernetes clusters, Databases and more from Teleport Web UI.'}
+          {props.canUseConnectMyComputer ? (
+            <>
+              You can add it in {$discoverLink} or by connecting your computer
+              to the cluster.
+            </>
+          ) : (
+            <>
+              Connect SSH servers, Kubernetes clusters, Databases and more from{' '}
+              {$discoverLink}.
+            </>
+          )}
         </Text>
         {props.canUseConnectMyComputer && (
           <ButtonPrimary
