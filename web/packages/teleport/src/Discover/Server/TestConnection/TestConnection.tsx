@@ -38,6 +38,7 @@ import { NodeMeta } from '../../useDiscover';
 import type { Option } from 'shared/components/Select';
 import type { AgentStepProps } from '../../types';
 import type { MfaAuthnResponse } from 'teleport/services/mfa';
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export function TestConnection(props: AgentStepProps) {
   const {
@@ -87,6 +88,7 @@ export function TestConnection(props: AgentStepProps) {
         <ReAuthenticate
           onMfaResponse={res => testConnection(selectedOpt.value, res)}
           onClose={cancelMfaDialog}
+          challengeScope={MFAChallengeScope.USER_SESSION}
         />
       )}
       <Header>Test Connection</Header>

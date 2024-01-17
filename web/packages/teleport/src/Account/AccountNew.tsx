@@ -35,6 +35,7 @@ import useManageDevices, {
 import AddDevice from './ManageDevices/AddDevice';
 import { ActionButton, Header } from './Header';
 import { PasswordBox } from './PasswordBox';
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export interface EnterpriseComponentProps {
   // TODO(bl-nero): Consider moving the notifications to its own store and
@@ -214,6 +215,7 @@ export function Account({
             onAuthenticated={setToken}
             onClose={hideReAuthenticate}
             actionText="registering a new device"
+            challengeScope={MFAChallengeScope.USER_SESSION}
           />
         )}
         {isAddDeviceVisible && (

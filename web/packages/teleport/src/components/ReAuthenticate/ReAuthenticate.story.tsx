@@ -20,6 +20,7 @@ import React from 'react';
 
 import { State } from './useReAuthenticate';
 import { ReAuthenticate } from './ReAuthenticate';
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export default {
   title: 'Teleport/ReAuthenticate',
@@ -47,4 +48,5 @@ const props: State = {
   onClose: () => null,
   auth2faType: 'on',
   actionText: 'performing this action',
+  challengeScope: MFAChallengeScope.UNSPECIFIED,
 };

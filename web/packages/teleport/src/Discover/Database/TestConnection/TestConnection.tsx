@@ -37,6 +37,7 @@ import { DatabaseEngine } from '../../SelectResource';
 import { useTestConnection, State } from './useTestConnection';
 
 import type { AgentStepProps } from '../../types';
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 /**
  * @deprecated Refactor Discover/Database/TestConnection away from the container component
@@ -89,6 +90,7 @@ export function TestConnectionView({
         <ReAuthenticate
           onMfaResponse={res => testConnection(makeTestConnRequest(), res)}
           onClose={cancelMfaDialog}
+          challengeScope={MFAChallengeScope.USER_SESSION}
         />
       )}
       <Header>Test Connection</Header>
