@@ -35,6 +35,7 @@ import (
 
 	"github.com/gravitational/teleport/api/types"
 	apiutils "github.com/gravitational/teleport/api/utils"
+	apiresources "github.com/gravitational/teleport/integrations/operator/apis/resources"
 	resourcesv5 "github.com/gravitational/teleport/integrations/operator/apis/resources/v5"
 	"github.com/gravitational/teleport/integrations/operator/controllers/resources"
 )
@@ -454,7 +455,7 @@ func TestAddTeleportResourceOriginRole(t *testing.T) {
 
 func getRoleStatusConditionError(object map[string]interface{}) []metav1.Condition {
 	var conditionsWithError []metav1.Condition
-	var status resourcesv5.TeleportRoleStatus
+	var status apiresources.Status
 	_ = mapstructure.Decode(object["status"], &status)
 
 	for _, condition := range status.Conditions {
