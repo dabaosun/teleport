@@ -25,6 +25,8 @@ import TextSelectCopy from 'teleport/components/TextSelectCopy';
 import { generateTshLoginCommand } from 'teleport/lib/util';
 import ReAuthenticate from 'teleport/components/ReAuthenticate';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import {
   ActionButtons,
   HeaderSubtitle,
@@ -37,7 +39,6 @@ import { DatabaseEngine } from '../../SelectResource';
 import { useTestConnection, State } from './useTestConnection';
 
 import type { AgentStepProps } from '../../types';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 /**
  * @deprecated Refactor Discover/Database/TestConnection away from the container component

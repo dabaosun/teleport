@@ -28,6 +28,8 @@ import { FeatureBox } from 'teleport/components/Layout';
 import ReAuthenticate from 'teleport/components/ReAuthenticate';
 import { RemoveDialog } from 'teleport/components/MfaDeviceList';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import { AuthDeviceList } from './ManageDevices/AuthDeviceList/AuthDeviceList';
 import useManageDevices, {
   State as ManageDevicesState,
@@ -35,7 +37,6 @@ import useManageDevices, {
 import AddDevice from './ManageDevices/AddDevice';
 import { ActionButton, Header } from './Header';
 import { PasswordBox } from './PasswordBox';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export interface EnterpriseComponentProps {
   // TODO(bl-nero): Consider moving the notifications to its own store and

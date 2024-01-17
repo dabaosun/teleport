@@ -47,13 +47,14 @@ import {
 import { sortNodeLogins } from 'teleport/services/nodes';
 import { ApiError } from 'teleport/services/api/parseError';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import { NodeMeta } from '../../useDiscover';
 
 import type { Option } from 'shared/components/Select';
 import type { AgentStepProps } from '../../types';
 import type { MfaAuthnResponse } from 'teleport/services/mfa';
 import type { ConnectionDiagnosticRequest } from 'teleport/services/agents';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export function TestConnection(props: AgentStepProps) {
   const { userService, storeUser } = useTeleport();

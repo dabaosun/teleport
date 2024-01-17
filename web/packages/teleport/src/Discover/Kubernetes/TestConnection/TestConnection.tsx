@@ -28,6 +28,8 @@ import TextSelectCopy from 'teleport/components/TextSelectCopy';
 import { generateTshLoginCommand } from 'teleport/lib/util';
 import ReAuthenticate from 'teleport/components/ReAuthenticate';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import {
   ActionButtons,
   HeaderSubtitle,
@@ -40,7 +42,6 @@ import { useTestConnection, State } from './useTestConnection';
 
 import type { AgentStepProps } from '../../types';
 import type { KubeImpersonation } from 'teleport/services/agents';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 /**
  * @deprecated Refactor Discover/Kubernetes/TestConnection away from the container component

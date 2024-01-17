@@ -30,9 +30,10 @@ import MfaDeviceList, { RemoveDialog } from 'teleport/components/MfaDeviceList';
 
 import ReAuthenticate from 'teleport/components/ReAuthenticate';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import AddDevice from './AddDevice';
 import useManageDevices, { State } from './useManageDevices';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export default function Container() {
   const ctx = useTeleport();

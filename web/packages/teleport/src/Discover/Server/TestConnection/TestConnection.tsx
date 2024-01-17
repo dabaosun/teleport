@@ -33,12 +33,13 @@ import {
 } from 'teleport/Discover/Shared';
 import { sortNodeLogins } from 'teleport/services/nodes';
 
+import { MFAChallengeScope } from 'teleport/services/auth/auth';
+
 import { NodeMeta } from '../../useDiscover';
 
 import type { Option } from 'shared/components/Select';
 import type { AgentStepProps } from '../../types';
 import type { MfaAuthnResponse } from 'teleport/services/mfa';
-import { MFAChallengeScope } from 'teleport/services/auth/auth';
 
 export function TestConnection(props: AgentStepProps) {
   const {
