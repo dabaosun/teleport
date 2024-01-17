@@ -396,9 +396,11 @@ type SessionData struct {
 	// An empty value is treated equivalently to "discouraged".
 	UserVerification string `json:"userVerification,omitempty"`
 	// ChallengeExtensions are Teleport extensions that apply to this webauthn session.
-	ChallengeExtensions mfav1.ChallengeExtensions `json:"challenge_extensions,omitempty"`
+	ChallengeExtensions *mfav1.ChallengeExtensions `json:"challenge_extensions,omitempty"`
 }
 
+// SessionDataFromProtocol converts a [webauthn.SessionData] struct to an
+// internal SessionData struct.
 func SessionDataFromProtocol(sd *webauthn.SessionData) (*SessionData, error) {
 	rawChallenge, err := base64.RawURLEncoding.DecodeString(sd.Challenge)
 	if err != nil {
@@ -413,6 +415,8 @@ func SessionDataFromProtocol(sd *webauthn.SessionData) (*SessionData, error) {
 	}, nil
 }
 
+// SessionDataFromProtocol converts an internal SessionData struct to a
+// [webauthn.SessionData] struct.
 func SessionDataToProtocol(sd *SessionData) *webauthn.SessionData {
 	// TODO(codingllama): Record extensions in stored session data.
 	return &webauthn.SessionData{
