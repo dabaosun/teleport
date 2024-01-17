@@ -43,7 +43,7 @@ const kind = props => {
       };
     case 'success':
       return {
-        background: theme.colors.success,
+        background: theme.colors.success.main,
         color: theme.colors.text.primaryInverse,
       };
     case 'outline-info':
