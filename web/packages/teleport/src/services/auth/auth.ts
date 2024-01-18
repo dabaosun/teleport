@@ -244,13 +244,7 @@ const auth = {
 
   headlessSSOAccept(transactionId: string) {
     return auth
-      .checkWebauthnSupport()
-      .then(() => api.post(cfg.api.mfaAuthnChallengePath))
-      .then(res =>
-        navigator.credentials.get({
-          publicKey: makeMfaAuthenticateChallenge(res).webauthnPublicKey,
-        })
-      )
+      .fetchWebauthnChallenge(MFAChallengeScope.HEADLESS_LOGIN)
       .then(res => {
         const request = {
           action: 'accept',
@@ -273,12 +267,15 @@ const auth = {
     return api.post(cfg.api.createPrivilegeTokenPath, { secondFactorToken });
   },
 
-  fetchWebauthnChallenge() {
+  fetchWebauthnChallenge(scope: MFAChallengeScope, allowReuse?: boolean) {
     return auth
       .checkWebauthnSupport()
       .then(() =>
         api
-          .post(cfg.api.mfaAuthnChallengePath)
+          .post(cfg.api.mfaAuthnChallengePath, {
+            challenge_scope: scope,
+            challenge_allow_reuse: allowReuse,
+          })
           .then(makeMfaAuthenticateChallenge)
       )
       .then(res =>
@@ -288,8 +285,8 @@ const auth = {
       );
   },
 
-  createPrivilegeTokenWithWebauthn() {
-    return auth.fetchWebauthnChallenge().then(res =>
+  createPrivilegeTokenWithWebauthn(scope) {
+    return auth.fetchWebauthnChallenge(scope).then(res =>
       api.post(cfg.api.createPrivilegeTokenPath, {
         webauthnAssertionResponse: makeWebauthnAssertionResponse(res),
       })
@@ -300,9 +297,9 @@ const auth = {
     return api.post(cfg.api.createPrivilegeTokenPath, {});
   },
 
-  getWebauthnResponse() {
+  getWebauthnResponse(scope: MFAChallengeScope, allowReuse?: boolean) {
     return auth
-      .fetchWebauthnChallenge()
+      .fetchWebauthnChallenge(scope, allowReuse)
       .then(res => makeWebauthnAssertionResponse(res));
   },
 };
@@ -361,3 +358,15 @@ export type IsMfaRequiredKube = {
     cluster_name: string;
   };
 };
+
+// MFAChallengeScope is an mfa challenge scope. Possible values are defined in mfa.proto
+export enum MFAChallengeScope {
+  UNSPECIFIED = 0,
+  LOGIN = 1,
+  PASSWORDLESS_LOGIN = 2,
+  HEADLESS_LOGIN = 3,
+  MANAGE_DEVICES = 4,
+  ACCOUNT_RECOVERY = 5,
+  USER_SESSION = 6,
+  ADMIN_ACTION = 7,
+}

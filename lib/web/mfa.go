@@ -131,19 +131,36 @@ func (h *Handler) addMFADeviceHandle(w http.ResponseWriter, r *http.Request, par
 	return OK(), nil
 }
 
+type createAuthenticateChallengeRequest struct {
+	ChallengeScope      int  `json:"challenge_scope"`
+	ChallengeAllowReuse bool `json:"challenge_allow_reuse"`
+}
+
 // createAuthenticateChallengeHandle creates and returns MFA authentication challenges for the user in context (logged in user).
 // Used when users need to re-authenticate their second factors.
 func (h *Handler) createAuthenticateChallengeHandle(w http.ResponseWriter, r *http.Request, p httprouter.Params, c *SessionContext) (interface{}, error) {
+	var req createAuthenticateChallengeRequest
+	if err := httplib.ReadJSON(r, &req); err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	clt, err := c.GetClient()
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
 
+	allowReuse := mfav1.ChallengeAllowReuse_CHALLENGE_ALLOW_REUSE_NO
+	if req.ChallengeAllowReuse {
+		allowReuse = mfav1.ChallengeAllowReuse_CHALLENGE_ALLOW_REUSE_YES
+	}
+
 	chal, err := clt.CreateAuthenticateChallenge(r.Context(), &proto.CreateAuthenticateChallengeRequest{
+		Request: &proto.CreateAuthenticateChallengeRequest_ContextUser{
+			ContextUser: &proto.ContextUser{},
+		},
 		ChallengeExtensions: &mfav1.ChallengeExtensions{
-			// TODO(Joerger): Web client needs to provide scope and allow reuse
-			Scope:      mfav1.ChallengeScope_CHALLENGE_SCOPE_UNSPECIFIED,
-			AllowReuse: mfav1.ChallengeAllowReuse_CHALLENGE_ALLOW_REUSE_UNSPECIFIED,
+			Scope:      mfav1.ChallengeScope(req.ChallengeScope),
+			AllowReuse: allowReuse,
 		},
 	})
 	if err != nil {
