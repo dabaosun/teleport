@@ -534,5 +534,5 @@ func getStatusSchema(parser *crdtools.Parser) (apiextv1.JSONSchemaProps, error) 
 			return parser.FlattenedSchemata[statusType], nil
 		}
 	}
-	return apiextv1.JSONSchemaProps{}, trace.NotFound("Package '%s' not found, cannot generate status JSON Schema", statusPackage)
+	return apiextv1.JSONSchemaProps{}, trace.NotFound("Package %q not found, cannot generate status JSON Schema", statusPackage)
 }
