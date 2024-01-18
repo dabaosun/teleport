@@ -382,6 +382,8 @@ type AuthenticationExtensionsClientOutputs struct {
 
 // SessionData is a clone of [webauthn.SessionData], materialized here to keep a
 // stable JSON marshal/unmarshal representation and add extensions.
+//
+// TODO(codingllama): Record extensions in stored session data.
 type SessionData struct {
 	// Raw challenge used for the ceremony.
 	Challenge []byte `json:"challenge,omitempty"`
@@ -406,7 +408,6 @@ func SessionDataFromProtocol(sd *webauthn.SessionData) (*SessionData, error) {
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	// TODO(codingllama): Record extensions in stored session data.
 	return &SessionData{
 		Challenge:        rawChallenge,
 		UserId:           sd.UserID,
@@ -418,7 +419,6 @@ func SessionDataFromProtocol(sd *webauthn.SessionData) (*SessionData, error) {
 // SessionDataFromProtocol converts an internal SessionData struct to a
 // [webauthn.SessionData] struct.
 func SessionDataToProtocol(sd *SessionData) *webauthn.SessionData {
-	// TODO(codingllama): Record extensions in stored session data.
 	return &webauthn.SessionData{
 		Challenge:            base64.RawURLEncoding.EncodeToString(sd.Challenge),
 		UserID:               sd.UserId,
