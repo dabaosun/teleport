@@ -421,7 +421,7 @@ func (generator *SchemaGenerator) singularProp(field *Field, prop *apiextv1.JSON
 	return nil
 }
 
-func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinition {
+func (root RootSchema) CustomResourceDefinition() (apiextv1.CustomResourceDefinition, error) {
 	crd := apiextv1.CustomResourceDefinition{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apiextv1.SchemeGroupVersion.String(),
@@ -453,7 +453,8 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 	// e.g. `+kubebuilder:validation:Minimum=0`
 	err := crdmarkers.Register(registry)
 	if err != nil {
-		panic(err)
+		return apiextv1.CustomResourceDefinition{},
+			trace.Wrap(err, "adding CRD markers to the registry")
 	}
 	parser := &crdtools.Parser{
 		Collector: &markers.Collector{Registry: registry},
@@ -467,7 +468,8 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 	// We parse go's AST to find its struct and convert it in a schema.
 	statusSchema, err := getStatusSchema(parser)
 	if err != nil {
-		panic(err)
+		return apiextv1.CustomResourceDefinition{},
+			trace.Wrap(err, "getting status schema from go's AST")
 	}
 
 	for i, schemaVersion := range root.versions {
@@ -503,7 +505,7 @@ func (root RootSchema) CustomResourceDefinition() apiextv1.CustomResourceDefinit
 			},
 		})
 	}
-	return crd
+	return crd, nil
 }
 
 // getShortNames returns the schema short names while ensuring they won't conflict with existing Kubernetes resources

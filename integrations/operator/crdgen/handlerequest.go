@@ -126,10 +126,13 @@ func generateSchema(file *File, groupName string, resp *gogoplugin.CodeGenerator
 	}
 
 	for _, root := range generator.roots {
-		crd := root.CustomResourceDefinition()
+		crd, err := root.CustomResourceDefinition()
+		if err != nil {
+			return trace.Wrap(err, "generating CRD")
+		}
 		data, err := yaml.Marshal(crd)
 		if err != nil {
-			return trace.Wrap(err)
+			return trace.Wrap(err, "marshalling CRD")
 		}
 		name := fmt.Sprintf("%s_%s.yaml", groupName, root.pluralName)
 		content := string(data)
