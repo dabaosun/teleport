@@ -25,11 +25,11 @@ import { arrayObjectIsEqual } from 'shared/utils/highbar';
 import { ResourceKind } from 'e-teleport/Workflow/NewRequest/useNewRequest';
 
 import {
-  UnifiedResourcePreferences,
   DefaultTab,
-  ViewMode,
   LabelsViewMode,
-} from 'shared/services/unifiedResourcePreferences';
+  UnifiedResourcePreferences,
+  ViewMode,
+} from 'gen-proto-ts/teleport/userpreferences/v1/unified_resource_preferences_pb';
 
 import { ModalsService } from 'teleterm/ui/services/modals';
 import { ClustersService } from 'teleterm/ui/services/clusters';
@@ -102,7 +102,7 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
   }
 
   getActiveWorkspace() {
-    return this.state.workspaces[this.state.rootClusterUri];
+    return this.state.workspaces[this.state.rootClusterUri!];
   }
 
   getRootClusterUri() {
@@ -140,9 +140,7 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
     });
   }
 
-  getWorkspaceDocumentService(
-    clusterUri: RootClusterUri
-  ): DocumentsService | undefined {
+  getWorkspaceDocumentService(clusterUri: RootClusterUri): DocumentsService {
     if (!this.documentsServicesCache.has(clusterUri)) {
       this.documentsServicesCache.set(
         clusterUri,
@@ -158,7 +156,7 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
       );
     }
 
-    return this.documentsServicesCache.get(clusterUri);
+    return this.documentsServicesCache.get(clusterUri)!;
   }
 
   getWorkspaceAccessRequestsService(
@@ -181,14 +179,14 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
     return this.accessRequestsServicesCache.get(clusterUri);
   }
 
-  isDocumentActive(documentUri: string): boolean {
+  isDocumentActive(documentUri: string): boolean | undefined {
     const documentService = this.getActiveWorkspaceDocumentService();
     return documentService && documentService.isActive(documentUri);
   }
 
   doesResourceBelongToActiveWorkspace(
     resourceUri: ClusterOrResourceUri
-  ): boolean {
+  ): boolean | undefined {
     return (
       this.state.rootClusterUri &&
       routing.belongsToProfile(this.state.rootClusterUri, resourceUri)
@@ -215,7 +213,9 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
     });
   }
 
-  getConnectMyComputerAutoStart(rootClusterUri: RootClusterUri): boolean {
+  getConnectMyComputerAutoStart(
+    rootClusterUri: RootClusterUri
+  ): boolean | undefined {
     return this.state.workspaces[rootClusterUri].connectMyComputer?.autoStart;
   }
 
@@ -416,7 +416,7 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
   private reopenPreviousDocuments(clusterUri: RootClusterUri): void {
     this.setState(draftState => {
       const workspace = draftState.workspaces[clusterUri];
-      workspace.documents = workspace.previous.documents.map(d => {
+      workspace.documents = workspace.previous!.documents.map(d => {
         //TODO: create a function that will prepare a new document, it will be used in:
         // DocumentsService
         // TrackedConnectionOperationsFactory
@@ -457,7 +457,7 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
 
         return d;
       });
-      workspace.location = workspace.previous.location;
+      workspace.location = workspace.previous!.location;
       workspace.previous = undefined;
     });
   }
@@ -475,12 +475,13 @@ export class WorkspacesService extends ImmutableStore<WorkspacesState> {
   }: {
     previousDocuments?: Document[];
     currentDocuments: Document[];
-  }): boolean {
+  }): boolean | undefined {
     const omitUriAndTitle = (documents: Document[]) =>
       documents.map(d => ({ ...d, uri: undefined, title: undefined }));
 
     return (
-      previousDocuments?.length &&
+      previousDocuments &&
+      previousDocuments.length > 0 &&
       !arrayObjectIsEqual(
         omitUriAndTitle(previousDocuments),
         omitUriAndTitle(currentDocuments)
