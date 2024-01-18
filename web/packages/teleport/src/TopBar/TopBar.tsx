@@ -279,7 +279,7 @@ const NavigationButton = ({
 }) => {
   const theme = useTheme();
   const selectedBorder = `2px solid ${theme.colors.brand}`;
-  const selectedBackground = theme.colors.interactive.tonal.primary[0];
+  const selectedBackground = theme.colors.interactive.tonal.neutral[0];
 
   return (
     <HoverTooltip
