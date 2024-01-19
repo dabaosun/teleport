@@ -1,6 +1,6 @@
-/*
+/**
  * Teleport
- * Copyright (C) 2023  Gravitational, Inc.
+ * Copyright (C) 2024  Gravitational, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -16,5 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CustomRange from './Custom';
-export default CustomRange;
+import { Box } from 'design';
+import styled from 'styled-components';
+
+export enum ItemStatus {
+  Success,
+  Warning,
+  Error,
+}
+
+export const StatusLight = styled(Box)`
+  border-radius: 50%;
+  margin-right: ${props => props.theme.space[2]}px;
+  width: 8px;
+  height: 8px;
+  background-color: ${({ status, theme }) => {
+    if (status === ItemStatus.Success) {
+      return theme.colors.success.main;
+    }
+    if (status === ItemStatus.Error) {
+      return theme.colors.error.main;
+    }
+    if (status === ItemStatus.Warning) {
+      return theme.colors.warning;
+    }
+    return theme.colors.grey[300]; // Unknown
+  }};
+`;

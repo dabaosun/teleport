@@ -16,26 +16,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package restrictedsession
-
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-)
-
-func FuzzParseIPSpec(f *testing.F) {
-	f.Add("127.0.0.111")
-	f.Add("127.0.0.111/8")
-	f.Add("192.168.0.0/16")
-	f.Add("2001:0db8:85a3:0000:0000:8a2e:0370:7334")
-	f.Add("2001:0db8:85a3:0000:0000:8a2e:0370:7334/64")
-	f.Add("2001:db8::ff00:42:8329")
-	f.Add("2001:db8::ff00:42:8329/48")
-
-	f.Fuzz(func(t *testing.T, cidr string) {
-		require.NotPanics(t, func() {
-			ParseIPSpec(cidr)
-		})
-	})
-}
+export { CustomRange } from './Custom';
