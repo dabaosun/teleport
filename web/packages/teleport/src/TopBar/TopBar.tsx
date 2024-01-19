@@ -52,7 +52,6 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
     feature =>
       feature.category === NavigationCategory.Resources && feature.topMenuItem
   );
-
   const { hasDockedElement, currentWidth } = useLayout();
   const theme: Theme = useTheme();
 
@@ -81,6 +80,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
     feature?.category === NavigationCategory.Management;
   const downloadTabSelected =
     history?.location?.pathname === cfg.routes.downloadCenter;
+  const iconSize = currentWidth >= theme.breakpoints.medium ? 24 : 20;
 
   return (
     <TopBarContainer navigationHidden={feature?.hideNavigation}>
@@ -103,6 +103,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
                 name="Downloads"
                 to={cfg.routes.downloadCenter}
                 isSelected={downloadTabSelected}
+                size={iconSize}
                 Icon={Download}
               />
             ) : (
@@ -110,6 +111,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
                 name="Resources"
                 to={cfg.getUnifiedResourcesRoute(clusterId)}
                 isSelected={resourceTabSelected}
+                size={iconSize}
                 Icon={Server}
               />
             )}
@@ -119,6 +121,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
                 features,
                 NavigationCategory.Management
               )}
+              size={iconSize}
               isSelected={managementTabSelected}
               Icon={SlidersVertical}
             />
@@ -141,7 +144,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
                 >
                   <topMenuItem.icon
                     color={selected ? 'text.main' : 'text.muted'}
-                    size={currentWidth >= theme.breakpoints.medium ? 24 : 20}
+                    size={iconSize}
                   />
                 </NavigationButton>
               );
@@ -157,9 +160,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
       <Flex height="100%" alignItems="center">
         {!hasDockedElement && assistProps?.assistEnabled && (
           <ButtonIconContainer onClick={() => assistProps?.setShowAssist(true)}>
-            <BrainIcon
-              size={currentWidth >= theme.breakpoints.medium ? 24 : 20}
-            />
+            <BrainIcon size={iconSize} />
           </ButtonIconContainer>
         )}
         <Notifications />
@@ -319,11 +320,13 @@ const NavigationButton = ({
 const MainNavItem = ({
   isSelected,
   to,
+  size,
   name,
   Icon,
 }: {
   isSelected: boolean;
   to: string;
+  size: number;
   name: string;
   Icon: (props: { color: string; size: number }) => JSX.Element;
 }) => {
@@ -337,10 +340,7 @@ const MainNavItem = ({
       to={to}
       title={!mediumAndUp ? name : ''}
     >
-      <Icon
-        color={isSelected ? 'text.main' : 'text.muted'}
-        size={mediumAndUp ? 24 : 20}
-      />
+      <Icon color={isSelected ? 'text.main' : 'text.muted'} size={size} />
       <Text
         ml={3}
         fontSize={largeAndUp ? 4 : 3}

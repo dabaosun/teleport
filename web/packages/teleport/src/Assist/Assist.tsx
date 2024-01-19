@@ -57,6 +57,8 @@ const slideIn = keyframes`
   }
 `;
 
+export const ASSIST_MIN_WIDTH = 520;
+
 function variables(props: { viewMode: ViewMode }) {
   switch (props.viewMode) {
     case ViewMode.Popup:
@@ -94,8 +96,8 @@ function variables(props: { viewMode: ViewMode }) {
         '--assist-border-radius': '0',
         '--assist-left': 'auto',
         '--assist-right': '0',
-        '--assist-width': '520px',
-        '--assist-height': '100vh',
+        '--assist-width': `${ASSIST_MIN_WIDTH}px`,
+        '--assist-height': 'calc(100vh - 72px)',
         '--assist-box-shadow': 'none',
         '--assist-left-border': '1px solid rgba(0, 0, 0, 0.1)',
         '--assist-header-height': '72px',
@@ -157,8 +159,8 @@ function sidebarVariables(props: {
     case ViewMode.Docked:
       if (props.sidebarVisible) {
         return {
-          '--conversation-width': '520px',
-          '--conversation-list-width': '520px',
+          '--conversation-width': `${ASSIST_MIN_WIDTH}px`,
+          '--conversation-list-width': `${ASSIST_MIN_WIDTH}px`,
           '--conversation-list-margin': '0',
           '--command-input-width': '380px',
           '--conversation-list-display': 'flex',
@@ -168,7 +170,7 @@ function sidebarVariables(props: {
 
       return {
         '--conversation-width': '525px',
-        '--conversation-list-width': '520px',
+        '--conversation-list-width': `${ASSIST_MIN_WIDTH}px`,
         '--conversation-list-margin':
           'calc((var(--conversation-list-width) * -1) - 1px)',
         '--command-input-width': '380px',
@@ -180,13 +182,17 @@ function sidebarVariables(props: {
 
 const Container = styled.div<{ docked: boolean }>`
   position: fixed;
-  top: ${p => p.theme.topBarHeight[0]}px;
-  @media screen and (min-width: ${p => p.theme.breakpoints.small}px) {
+  ${p =>
+    p.docked
+      ? `top: ${p.theme.topBarHeight[0]}px;
+  @media screen and (min-width: ${p.theme.breakpoints.small}px) {
     top: ${p => p.theme.topBarHeight[1]}px;
   }
-  @media screen and (min-width: ${p => p.theme.breakpoints.large}px) {
-    top: ${p => p.theme.topBarHeight[2]}px;
+  @media screen and (min-width: ${p.theme.breakpoints.large}px) {
+    top: ${p.theme.topBarHeight[2]}px;
   }
+  `
+      : 'top: 0;'}
   left: ${p => (p.docked ? 'auto' : '0')};
   right: 0;
   bottom: 0;

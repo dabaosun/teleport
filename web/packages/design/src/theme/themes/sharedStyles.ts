@@ -25,7 +25,7 @@ import { SharedColors, SharedStyles } from './types';
 
 // TODO(bl-nero): use a CSS var for sidebar width and make the breakpoints work
 // by changing the minimum width on a per-view basis (Main.tsx).
-const sidebarWidth = 256;
+export const SIDEBAR_WIDTH = 256;
 
 // Styles that are shared by all themes.
 export const sharedStyles: SharedStyles = {
@@ -37,9 +37,9 @@ export const sharedStyles: SharedStyles = {
   ],
   breakpoints: {
     // TODO (avatus): remove mobile/tablet/desktop breakpoints in favor of screensize descriptions
-    mobile: 400 + sidebarWidth,
-    tablet: 800 + sidebarWidth,
-    desktop: 1200 + sidebarWidth,
+    mobile: 400 + SIDEBAR_WIDTH,
+    tablet: 800 + SIDEBAR_WIDTH,
+    desktop: 1200 + SIDEBAR_WIDTH,
     // use these from now on
     small: 600,
     medium: 1024,

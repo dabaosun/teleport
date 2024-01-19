@@ -35,6 +35,7 @@ import useAttempt from 'shared/hooks/useAttemptNext';
 import { matchPath, useHistory } from 'react-router';
 
 import Dialog from 'design/Dialog';
+import { SIDEBAR_WIDTH } from 'design/theme/themes/sharedStyles';
 
 import { Redirect, Route, Switch } from 'teleport/components/Router';
 import { CatchError } from 'teleport/components/CatchError';
@@ -55,6 +56,7 @@ import { TopBarProps } from 'teleport/TopBar/TopBar';
 import { useUser } from 'teleport/User/UserContext';
 import { ViewMode } from 'teleport/Assist/types';
 import { QuestionnaireProps } from 'teleport/Welcome/NewCredentials';
+import { ASSIST_MIN_WIDTH } from 'teleport/Assist/Assist';
 
 import { MainContainer } from './MainContainer';
 import { OnboardDiscover } from './OnboardDiscover';
@@ -99,6 +101,14 @@ export function Main(props: MainProps) {
     () => props.features.filter(feature => feature.hasAccess(featureFlags)),
     [featureFlags, props.features]
   );
+  const feature = features
+    .filter(feature => Boolean(feature.route))
+    .find(f =>
+      matchPath(history.location.pathname, {
+        path: f.route.path,
+        exact: f.route.exact ?? false,
+      })
+    );
 
   const { alerts, dismissAlert } = useAlerts(props.initialAlerts);
 
@@ -188,6 +198,7 @@ export function Main(props: MainProps) {
           <Navigation />
           <HorizontalSplit
             dockedView={showAssist && viewMode === ViewMode.Docked}
+            hasSidebar={feature?.category === NavigationCategory.Management}
           >
             <ContentMinWidth>
               <BannerList
@@ -308,7 +319,7 @@ const ContentMinWidth = ({ children }: { children: ReactNode }) => {
           display: flex;
           flex-direction: column;
           flex: 1;
-          ${enforceMinWidth ? 'min-width: 1250px;' : ''}
+          ${enforceMinWidth ? 'min-width: 1000px;' : ''}
         `}
       >
         {children}
@@ -317,11 +328,24 @@ const ContentMinWidth = ({ children }: { children: ReactNode }) => {
   );
 };
 
+function getWidth(hasSidebar: boolean, isDockedView: boolean) {
+  if (hasSidebar && isDockedView) {
+    return `max-width: calc(100% - ${SIDEBAR_WIDTH}px - ${ASSIST_MIN_WIDTH}px);`;
+  }
+  if (isDockedView) {
+    return `max-width: calc(100% - ${ASSIST_MIN_WIDTH}px);`;
+  }
+  if (hasSidebar) {
+    return `max-width: calc(100% - ${SIDEBAR_WIDTH}px);`;
+  }
+  return 'max-width: 100%;';
+}
+
 export const HorizontalSplit = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  ${props => props.dockedView && 'max-width: calc(100% - 520px);'}
+  ${props => getWidth(props.hasSidebar, props.dockedView)}
   overflow-x: auto;
 `;
 
@@ -334,5 +358,6 @@ const Wrapper = styled(Box)<{ hasDockedElement: boolean }>`
   display: flex;
   height: 100vh;
   flex-direction: column;
-  width: ${p => (p.hasDockedElement ? 'calc(100vw - 520px)' : '100vw')};
+  width: ${p =>
+    p.hasDockedElement ? `calc(100vw - ${ASSIST_MIN_WIDTH}px)` : '100vw'};
 `;

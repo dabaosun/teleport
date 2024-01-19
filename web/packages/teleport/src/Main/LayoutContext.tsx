@@ -22,6 +22,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useRef,
 } from 'react';
 
 interface LayoutContextValue {
@@ -35,16 +36,17 @@ const LayoutContext = createContext<LayoutContextValue>(null);
 export function LayoutContextProvider(props: PropsWithChildren<unknown>) {
   const [hasDockedElement, setHasDockedElement] = useState(false);
   const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
+  const containerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
-    const handleResize = () => {
-      setCurrentWidth(window.innerWidth);
-    };
+    const resizeObserver = new ResizeObserver(entries => {
+      const container = entries[0];
+      setCurrentWidth(container?.contentRect.width || 0);
+    });
 
-    window.addEventListener('resize', handleResize);
-
+    resizeObserver.observe(containerRef.current);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 
@@ -52,7 +54,7 @@ export function LayoutContextProvider(props: PropsWithChildren<unknown>) {
     <LayoutContext.Provider
       value={{ hasDockedElement, setHasDockedElement, currentWidth }}
     >
-      {props.children}
+      <div ref={containerRef}>{props.children}</div>
     </LayoutContext.Provider>
   );
 }
