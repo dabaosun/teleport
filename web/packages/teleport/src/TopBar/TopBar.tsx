@@ -203,18 +203,19 @@ const TeleportLogo = ({ CustomLogo }: TopBarProps) => {
       tipContent="Teleport Resources Home"
       css={`
         height: 100%;
+        margin-right: 0px;
+        @media screen and (min-width: ${p => p.theme.breakpoints.medium}px) {
+          margin-right: 76px;
+        }
+        @media screen and (min-width: ${p => p.theme.breakpoints.large}px) {
+          margin-right: 67px;
+        }
       `}
     >
       <Link
         css={`
           cursor: pointer;
-          height: 100%;
           display: flex;
-          width: 190px;
-          @media screen and (min-width: ${p => p.theme.breakpoints.medium}px) {
-            width: 256px;
-          }
-
           transition: background-color 0.1s linear;
           &:hover {
             background-color: ${p =>
@@ -233,11 +234,13 @@ const TeleportLogo = ({ CustomLogo }: TopBarProps) => {
             alt="teleport logo"
             css={`
               padding-left: ${props => props.theme.space[3]}px;
+              padding-right: ${props => props.theme.space[3]}px;
               height: 18px;
               @media screen and (min-width: ${p =>
                   p.theme.breakpoints.small}px) {
                 height: 28px;
                 padding-left: ${props => props.theme.space[4]}px;
+                padding-right: ${props => props.theme.space[4]}px;
               }
               @media screen and (min-width: ${p =>
                   p.theme.breakpoints.large}px) {
