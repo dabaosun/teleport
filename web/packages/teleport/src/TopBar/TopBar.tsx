@@ -282,6 +282,7 @@ const NavigationButton = ({
       <Link
         to={to}
         css={`
+          box-sizing: border-box;
           text-decoration: none;
           color: rgba(0, 0, 0, 0.54);
           height: 100%;
