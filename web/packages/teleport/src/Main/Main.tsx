@@ -35,7 +35,7 @@ import useAttempt from 'shared/hooks/useAttemptNext';
 import { matchPath, useHistory } from 'react-router';
 
 import Dialog from 'design/Dialog';
-import { SIDEBAR_WIDTH } from 'design/theme/themes/sharedStyles';
+import { sharedStyles } from 'design/theme/themes/sharedStyles';
 
 import { Redirect, Route, Switch } from 'teleport/components/Router';
 import { CatchError } from 'teleport/components/CatchError';
@@ -56,7 +56,6 @@ import { TopBarProps } from 'teleport/TopBar/TopBar';
 import { useUser } from 'teleport/User/UserContext';
 import { ViewMode } from 'teleport/Assist/types';
 import { QuestionnaireProps } from 'teleport/Welcome/NewCredentials';
-import { ASSIST_MIN_WIDTH } from 'teleport/Assist/Assist';
 
 import { MainContainer } from './MainContainer';
 import { OnboardDiscover } from './OnboardDiscover';
@@ -329,14 +328,15 @@ const ContentMinWidth = ({ children }: { children: ReactNode }) => {
 };
 
 function getWidth(hasSidebar: boolean, isDockedView: boolean) {
+  const { dockedAssistWidth, sidebarWidth } = sharedStyles;
   if (hasSidebar && isDockedView) {
-    return `max-width: calc(100% - ${SIDEBAR_WIDTH}px - ${ASSIST_MIN_WIDTH}px);`;
+    return `max-width: calc(100% - ${sidebarWidth}px - ${dockedAssistWidth}px);`;
   }
   if (isDockedView) {
-    return `max-width: calc(100% - ${ASSIST_MIN_WIDTH}px);`;
+    return `max-width: calc(100% - ${dockedAssistWidth}px);`;
   }
   if (hasSidebar) {
-    return `max-width: calc(100% - ${SIDEBAR_WIDTH}px);`;
+    return `max-width: calc(100% - ${sidebarWidth}px);`;
   }
   return 'max-width: 100%;';
 }
@@ -359,5 +359,7 @@ const Wrapper = styled(Box)<{ hasDockedElement: boolean }>`
   height: 100vh;
   flex-direction: column;
   width: ${p =>
-    p.hasDockedElement ? `calc(100vw - ${ASSIST_MIN_WIDTH}px)` : '100vw'};
+    p.hasDockedElement
+      ? `calc(100vw - ${p.theme.dockedAssistWidth}px)`
+      : '100vw'};
 `;

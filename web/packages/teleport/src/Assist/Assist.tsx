@@ -18,6 +18,7 @@
 
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { sharedStyles } from 'design/theme/themes/sharedStyles';
 
 import { Header } from 'teleport/Assist/Header';
 import { ConversationHistory } from 'teleport/Assist/ConversationHistory';
@@ -32,6 +33,8 @@ import { Settings } from 'teleport/Assist/Settings';
 import { ErrorBanner, ErrorList } from 'teleport/Assist/ErrorBanner';
 import { useUser } from 'teleport/User/UserContext';
 import { LandingPage } from 'teleport/Assist/LandingPage';
+
+const { dockedAssistWidth } = sharedStyles;
 
 interface AssistProps {
   onClose: () => void;
@@ -56,8 +59,6 @@ const slideIn = keyframes`
     transform: translate3d(0, 0, 0);
   }
 `;
-
-export const ASSIST_MIN_WIDTH = 520;
 
 function variables(props: { viewMode: ViewMode }) {
   switch (props.viewMode) {
@@ -96,7 +97,7 @@ function variables(props: { viewMode: ViewMode }) {
         '--assist-border-radius': '0',
         '--assist-left': 'auto',
         '--assist-right': '0',
-        '--assist-width': `${ASSIST_MIN_WIDTH}px`,
+        '--assist-width': `${dockedAssistWidth}px`,
         '--assist-height': 'calc(100vh - 72px)',
         '--assist-box-shadow': 'none',
         '--assist-left-border': '1px solid rgba(0, 0, 0, 0.1)',
@@ -159,8 +160,8 @@ function sidebarVariables(props: {
     case ViewMode.Docked:
       if (props.sidebarVisible) {
         return {
-          '--conversation-width': `${ASSIST_MIN_WIDTH}px`,
-          '--conversation-list-width': `${ASSIST_MIN_WIDTH}px`,
+          '--conversation-width': `${dockedAssistWidth}px`,
+          '--conversation-list-width': `${dockedAssistWidth}px`,
           '--conversation-list-margin': '0',
           '--command-input-width': '380px',
           '--conversation-list-display': 'flex',
@@ -170,7 +171,7 @@ function sidebarVariables(props: {
 
       return {
         '--conversation-width': '525px',
-        '--conversation-list-width': `${ASSIST_MIN_WIDTH}px`,
+        '--conversation-list-width': `${dockedAssistWidth}px`,
         '--conversation-list-margin':
           'calc((var(--conversation-list-width) * -1) - 1px)',
         '--command-input-width': '380px',

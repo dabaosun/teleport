@@ -35,15 +35,6 @@ function render(banner: React.ReactNode) {
 
 describe('components/BannerList/Banner', () => {
   let banners: BannerType[] = null;
-  beforeAll(() => {
-    class ResizeObserver {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    }
-    // eslint-disable-next-line jest/prefer-spy-on
-    global.ResizeObserver = ResizeObserver;
-  });
   beforeEach(() => {
     banners = [
       {
