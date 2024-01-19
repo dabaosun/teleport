@@ -180,7 +180,13 @@ function sidebarVariables(props: {
 
 const Container = styled.div<{ docked: boolean }>`
   position: fixed;
-  top: 0;
+  top: ${p => p.theme.topBarHeight[0]}px;
+  @media screen and (min-width: ${p => p.theme.breakpoints.small}px) {
+    top: ${p => p.theme.topBarHeight[1]}px;
+  }
+  @media screen and (min-width: ${p => p.theme.breakpoints.large}px) {
+    top: ${p => p.theme.topBarHeight[2]}px;
+  }
   left: ${p => (p.docked ? 'auto' : '0')};
   right: 0;
   bottom: 0;

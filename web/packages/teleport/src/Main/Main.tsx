@@ -21,6 +21,7 @@ import React, {
   Suspense,
   useEffect,
   useMemo,
+  lazy,
   useState,
   createContext,
   useContext,
@@ -51,6 +52,8 @@ import {
 } from 'teleport/Navigation/Navigation';
 import { NavigationCategory } from 'teleport/Navigation/categories';
 import { TopBarProps } from 'teleport/TopBar/TopBar';
+import { useUser } from 'teleport/User/UserContext';
+import { ViewMode } from 'teleport/Assist/types';
 import { QuestionnaireProps } from 'teleport/Welcome/NewCredentials';
 
 import { MainContainer } from './MainContainer';
@@ -58,6 +61,8 @@ import { OnboardDiscover } from './OnboardDiscover';
 
 import type { BannerType } from 'teleport/components/BannerList/BannerList';
 import type { LockedFeatures, TeleportFeature } from 'teleport/types';
+
+const Assist = lazy(() => import('teleport/Assist'));
 
 export interface MainProps {
   initialAlerts?: ClusterAlert[];
@@ -84,6 +89,10 @@ export function Main(props: MainProps) {
     run(() => ctx.init());
   }, []);
 
+  const { preferences } = useUser();
+  const viewMode = preferences?.assist?.viewMode;
+  const assistEnabled = ctx.getFeatureFlags().assist && ctx.assistEnabled;
+  const [showAssist, setShowAssist] = useState(false);
   const featureFlags = ctx.getFeatureFlags();
 
   const features = useMemo(
@@ -168,11 +177,18 @@ export function Main(props: MainProps) {
             ? props.topBarProps.CustomLogo
             : null
         }
+        assistProps={{
+          showAssist,
+          setShowAssist,
+          assistEnabled,
+        }}
       />
       <Wrapper>
         <MainContainer>
           <Navigation />
-          <HorizontalSplit>
+          <HorizontalSplit
+            dockedView={showAssist && viewMode === ViewMode.Docked}
+          >
             <ContentMinWidth>
               <BannerList
                 banners={banners}
@@ -185,6 +201,12 @@ export function Main(props: MainProps) {
               </Suspense>
             </ContentMinWidth>
           </HorizontalSplit>
+
+          {showAssist && (
+            <Suspense fallback={null}>
+              <Assist onClose={() => setShowAssist(false)} />
+            </Suspense>
+          )}
         </MainContainer>
       </Wrapper>
       {displayOnboardDiscover && (
@@ -299,6 +321,7 @@ export const HorizontalSplit = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  ${props => props.dockedView && 'max-width: calc(100% - 520px);'}
   overflow-x: auto;
 `;
 
