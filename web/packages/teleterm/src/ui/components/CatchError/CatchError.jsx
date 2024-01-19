@@ -17,8 +17,8 @@
  */
 
 import React from 'react';
-import { Failed } from 'design/CardError';
 
+import { FailedApp } from 'teleterm/ui/components/App';
 import Logger from 'teleterm/logger';
 
 export default class CatchError extends React.Component {
@@ -39,7 +39,7 @@ export default class CatchError extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <Failed alignSelf={'baseline'} message={this.state.error.message} />
+        <FailedApp message={this.state.error?.message || this.state.error} />
       );
     }
 
