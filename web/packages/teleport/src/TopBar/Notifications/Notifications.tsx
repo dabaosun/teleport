@@ -18,8 +18,9 @@
 
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Text } from 'design';
+import { Theme } from 'design/theme/themes/types';
 
 import { Notification as NotificationIcon, UserList } from 'design/Icon';
 import { useRefClickOutside } from 'shared/hooks/useRefClickOutside';
@@ -41,12 +42,15 @@ import {
   Notification,
   NotificationKind,
 } from 'teleport/stores/storeNotifications';
+import { useLayout } from 'teleport/Main/LayoutContext';
 
 import { ButtonIconContainer } from '../Shared';
 
 export function Notifications() {
   const ctx = useTeleport();
   useStore(ctx.storeNotifications);
+  const { currentWidth } = useLayout();
+  const theme: Theme = useTheme();
 
   const notices = ctx.storeNotifications.getNotifications();
 
@@ -86,7 +90,10 @@ export function Notifications() {
           data-testid="tb-note-button"
         >
           {items.length > 0 && <AttentionDot data-testid="tb-note-attention" />}
-          <NotificationIcon color={open ? 'text.main' : 'text.muted'} />
+          <NotificationIcon
+            color={open ? 'text.main' : 'text.muted'}
+            size={currentWidth >= theme.breakpoints.medium ? 24 : 20}
+          />
         </ButtonIconContainer>
 
         <Dropdown

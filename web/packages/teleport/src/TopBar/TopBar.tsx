@@ -24,6 +24,7 @@ import { Flex, Image, Text, TopNav } from 'design';
 import { matchPath, useHistory } from 'react-router';
 
 import { BrainIcon } from 'design/SVGIcon';
+import { Theme } from 'design/theme/themes/types';
 
 import { ArrowLeft, Download, Server, SlidersVertical } from 'design/Icon';
 import { HoverTooltip } from 'shared/components/ToolTip';
@@ -52,7 +53,8 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
       feature.category === NavigationCategory.Resources && feature.topMenuItem
   );
 
-  const { hasDockedElement } = useLayout();
+  const { hasDockedElement, currentWidth } = useLayout();
+  const theme: Theme = useTheme();
 
   // find active feature
   const feature = features
@@ -139,6 +141,7 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
                 >
                   <topMenuItem.icon
                     color={selected ? 'text.main' : 'text.muted'}
+                    size={currentWidth >= theme.breakpoints.medium ? 24 : 20}
                   />
                 </NavigationButton>
               );
@@ -154,7 +157,9 @@ export function TopBar({ CustomLogo, assistProps }: TopBarProps) {
       <Flex height="100%" alignItems="center">
         {!hasDockedElement && assistProps?.assistEnabled && (
           <ButtonIconContainer onClick={() => assistProps?.setShowAssist(true)}>
-            <BrainIcon />
+            <BrainIcon
+              size={currentWidth >= theme.breakpoints.medium ? 24 : 20}
+            />
           </ButtonIconContainer>
         )}
         <Notifications />
@@ -230,7 +235,7 @@ const TeleportLogo = ({ CustomLogo }: TopBarProps) => {
               padding-left: ${props => props.theme.space[3]}px;
               height: 18px;
               @media screen and (min-width: ${p =>
-                  p.theme.breakpoints.medium}px) {
+                  p.theme.breakpoints.small}px) {
                 height: 28px;
                 padding-left: ${props => props.theme.space[4]}px;
               }
@@ -316,27 +321,26 @@ const MainNavItem = ({
   isSelected: boolean;
   to: string;
   name: string;
-  Icon: (props: { color: string }) => JSX.Element;
+  Icon: (props: { color: string; size: number }) => JSX.Element;
 }) => {
+  const { currentWidth } = useLayout();
+  const theme: Theme = useTheme();
+  const mediumAndUp = currentWidth >= theme.breakpoints.medium;
   return (
-    <>
-      <NavigationButton
-        selected={isSelected}
-        to={to}
-        title={name}
-        css={`
-          display: block;
-          @media screen and (min-width: ${p => p.theme.breakpoints.medium}px) {
-            display: none;
-          }
-        `}
-      >
-        <Icon color={isSelected ? 'text.main' : 'text.muted'} />
-      </NavigationButton>
-      <NavigationButton
-        selected={isSelected}
-        to={to}
-        title={''}
+    <NavigationButton
+      selected={isSelected}
+      to={to}
+      title={!mediumAndUp ? name : ''}
+    >
+      <Icon
+        color={isSelected ? 'text.main' : 'text.muted'}
+        size={mediumAndUp ? 24 : 20}
+      />
+      <Text
+        ml={3}
+        fontSize={18}
+        fontWeight={500}
+        color={isSelected ? 'text.main' : 'text.muted'}
         css={`
           display: none;
           @media screen and (min-width: ${p => p.theme.breakpoints.medium}px) {
@@ -344,17 +348,9 @@ const MainNavItem = ({
           }
         `}
       >
-        <Icon color={isSelected ? 'text.main' : 'text.muted'} />
-        <Text
-          ml={3}
-          fontSize={18}
-          fontWeight={500}
-          color={isSelected ? 'text.main' : 'text.muted'}
-        >
-          {name}
-        </Text>
-      </NavigationButton>
-    </>
+        {name}
+      </Text>
+    </NavigationButton>
   );
 };
 
