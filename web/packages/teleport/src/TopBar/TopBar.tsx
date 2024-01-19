@@ -326,6 +326,7 @@ const MainNavItem = ({
   const { currentWidth } = useLayout();
   const theme: Theme = useTheme();
   const mediumAndUp = currentWidth >= theme.breakpoints.medium;
+  const largeAndUp = currentWidth >= theme.breakpoints.large;
   return (
     <NavigationButton
       selected={isSelected}
@@ -338,7 +339,7 @@ const MainNavItem = ({
       />
       <Text
         ml={3}
-        fontSize={18}
+        fontSize={largeAndUp ? 4 : 3}
         fontWeight={500}
         color={isSelected ? 'text.main' : 'text.muted'}
         css={`
