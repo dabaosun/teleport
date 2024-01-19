@@ -21,20 +21,37 @@ import React, {
   PropsWithChildren,
   useContext,
   useState,
+  useEffect,
 } from 'react';
 
 interface LayoutContextValue {
   hasDockedElement: boolean;
   setHasDockedElement: (value: boolean) => void;
+  currentWidth: number;
 }
 
 const LayoutContext = createContext<LayoutContextValue>(null);
 
 export function LayoutContextProvider(props: PropsWithChildren<unknown>) {
   const [hasDockedElement, setHasDockedElement] = useState(false);
+  const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCurrentWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
-    <LayoutContext.Provider value={{ hasDockedElement, setHasDockedElement }}>
+    <LayoutContext.Provider
+      value={{ hasDockedElement, setHasDockedElement, currentWidth }}
+    >
       {props.children}
     </LayoutContext.Provider>
   );
